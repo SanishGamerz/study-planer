@@ -1,172 +1,1155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chitwan Smart Planner - MLH Hack Days</title>
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://tailwindcss.com"></script>
+    <title>AURA // Next-Gen Smart Study Planner</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            dark: '#0B0F19',
-                            card: '#161B26',
-                            accent: '#6366F1',
-                            neonGlow: '#00F2FE',
-                            purpleGlow: '#9D4EDD'
-                        }
+                            50: '#f0f3ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        emerald: { 500: '#10b981', 600: '#059669' },
+                        amber: { 500: '#f59e0b', 600: '#d97706' },
+                        rose: { 500: '#f43f5e', 600: '#e11d48' },
+                        cyan: { 500: '#06b6d4', 600: '#0891b2' },
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cloudflare.com">
+
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Micro-Styling & Glassmorphism -->
     <style>
-        .glow-effect {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .neon-text-glow {
-            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pulse-glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            animation: pulseGlow 2.5s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+            100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.6); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+
+        /* Circular Progress Animation */
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
         }
     </style>
 </head>
-<body class="bg-brand-dark text-slate-100 font-sans min-h-screen selection:bg-brand-accent selection:text-white">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <!-- Navigation Header -->
-    <nav class="border-b border-slate-800 bg-brand-dark/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="bg-gradient-to-tr from-brand-accent to-brand-neonGlow p-2.5 rounded-xl shadow-lg">
-                    <i class="fa-solid fa-bolt text-brand-dark text-xl font-bold"></i>
+    <!-- Top Glass Navigation Bar -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-200/50 dark:border-slate-800/50 px-4 sm:px-8 py-3.5">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- Logo & Brand Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fas fa-brain text-xl"></i>
                 </div>
                 <div>
-                    <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-neonGlow bg-clip-text text-transparent">CCT SmartTracker</span>
-                    <span class="block text-xs text-slate-400 font-medium tracking-wider uppercase">Everyday Solutions</span>
+                    <span class="font-extrabold text-xl tracking-tight gradient-text block leading-none">AURA</span>
+                    <span class="text-[10px] font-mono font-semibold tracking-wider text-slate-400 dark:text-slate-500 uppercase">STUDY INTELLIGENCE</span>
                 </div>
             </div>
-            <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-full text-xs font-semibold text-slate-300 shadow-inner">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1"></span> MLH Hack Days Live
+
+            <!-- Central Tab Navigation -->
+            <nav class="hidden md:flex items-center gap-1 bg-slate-200/60 dark:bg-slate-900/60 p-1 rounded-2xl border border-slate-300/40 dark:border-slate-800">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-tab active-tab px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm">
+                    <i class="fas fa-chart-pie"></i> Executive View
+                </button>
+                <button onclick="switchTab('tasks')" id="nav-tasks" class="nav-tab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                    <i class="fas fa-tasks"></i> Smart Tasks
+                </button>
+                <button onclick="switchTab('timer')" id="nav-timer" class="nav-tab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                    <i class="fas fa-stopwatch"></i> Pomodoro & Sound
+                </button>
+                <button onclick="switchTab('timetable')" id="nav-timetable" class="nav-tab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                    <i class="fas fa-calendar-alt"></i> Weekly Schedule
+                </button>
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-tab px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all flex items-center gap-2">
+                    <i class="fas fa-chart-line"></i> Insights
+                </button>
+            </nav>
+
+            <!-- Quick Action & Theme Switcher -->
+            <div class="flex items-center gap-3">
+                <button onclick="openNewTaskModal()" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs transition-all shadow-md shadow-brand-500/20 active:scale-95 flex items-center gap-2">
+                    <i class="fas fa-plus"></i> <span class="hidden sm:inline">Add Task</span>
+                </button>
+                <button onclick="toggleDarkMode()" id="theme-toggle-btn" class="w-9 h-9 rounded-xl bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:scale-105 transition-all">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block text-amber-400"></i>
+                </button>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        
-        <!-- Welcome Hero Section -->
-        <div class="text-center max-w-3xl mx-auto mb-12">
-            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-white mb-4">
-                Master Your Day in <span class="bg-gradient-to-r from-brand-neonGlow to-brand-purpleGlow bg-clip-text text-transparent neon-text-glow">Bharatpur</span>
-            </h1>
-            <p class="text-slate-400 text-lg leading-relaxed">
-                An intelligent local companion built to solve daily scheduling conflicts, load-shedding windows, and college routines instantly using client-side smart optimization.
-            </p>
-        </div>
+    <!-- Mobile Navigation Bar (Bottom Dock) -->
+    <div class="md:hidden fixed bottom-3 left-3 right-3 z-50 glass-panel rounded-2xl p-2 border border-slate-300/50 dark:border-slate-800 flex justify-around items-center text-xs font-bold">
+        <button onclick="switchTab('dashboard')" class="p-2.5 rounded-xl flex flex-col items-center gap-1 text-brand-500">
+            <i class="fas fa-chart-pie text-base"></i>
+            <span class="text-[9px]">Dashboard</span>
+        </button>
+        <button onclick="switchTab('tasks')" class="p-2.5 rounded-xl flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-tasks text-base"></i>
+            <span class="text-[9px]">Tasks</span>
+        </button>
+        <button onclick="switchTab('timer')" class="p-2.5 rounded-xl flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-stopwatch text-base"></i>
+            <span class="text-[9px]">Timer</span>
+        </button>
+        <button onclick="switchTab('timetable')" class="p-2.5 rounded-xl flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-calendar-alt text-base"></i>
+            <span class="text-[9px]">Schedule</span>
+        </button>
+        <button onclick="switchTab('analytics')" class="p-2.5 rounded-xl flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-chart-line text-base"></i>
+            <span class="text-[9px]">Analytics</span>
+        </button>
+    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Container Body -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-8 pb-24 md:pb-8">
+
+        <!-- TAB 1: EXECUTIVE DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content space-y-8">
             
-            <!-- Left Panel: Smart Core Input Form -->
-            <div class="bg-brand-card border border-slate-800/80 rounded-2xl p-6 glow-effect h-fit">
-                <div class="flex items-center space-x-3 mb-6">
-                    <i class="fa-solid fa-brain text-brand-neonGlow text-xl"></i>
-                    <h2 class="text-xl font-bold text-white tracking-wide">Optimize Schedule</h2>
-                </div>
+            <!-- Greeting & Quick Status Header -->
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl shadow-brand-500/5">
+                <div class="absolute -right-16 -top-16 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
                 
-                <form id="scheduleForm" onsubmit="addRoutineItem(event)" class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Activity Name</label>
-                        <input type="text" id="taskName" required placeholder="e.g., DSA Lab, Commute, Study Group" 
-                            class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-accent transition shadow-inner">
+                <div class="space-y-2 z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 text-xs font-bold border border-brand-500/20">
+                        <i class="fas fa-fire text-amber-500"></i> <span id="streak-counter">7 Day Study Streak</span>
                     </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        <span id="dynamic-greeting">Good Morning</span>, <span class="gradient-text">Scholar!</span>
+                    </h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-medium max-w-lg">
+                        "Success is the sum of small efforts, repeated day in and day out." Ready to crush your targets today?
+                    </p>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Start Time</label>
-                            <input type="time" id="startTime" required 
-                                class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-brand-accent transition shadow-inner">
+                <!-- Daily Completion Progress Ring Widget -->
+                <div class="flex items-center gap-6 z-10 bg-slate-100/60 dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200/50 dark:border-slate-800">
+                    <div class="relative w-20 h-20 flex items-center justify-center">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-slate-200 dark:text-slate-800 stroke-current" stroke-width="8" cx="50" cy="50" r="40" fill="transparent"></circle>
+                            <circle id="dash-progress-ring" class="text-brand-500 stroke-current progress-ring-circle" stroke-width="8" stroke-linecap="round" cx="50" cy="50" r="40" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="100"></circle>
+                        </svg>
+                        <span id="dash-progress-percent" class="absolute font-extrabold text-sm">0%</span>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[10px] font-mono text-slate-400 uppercase font-bold block">DAILY GOAL STATUS</span>
+                        <div class="text-lg font-extrabold" id="dash-task-ratio">0 / 0 Tasks Done</div>
+                        <div class="text-xs text-emerald-500 font-semibold flex items-center gap-1">
+                            <i class="fas fa-clock"></i> <span id="dash-hours-logged">0.0 hrs</span> focused
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Category</label>
-                            <select id="taskCategory" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-brand-accent transition shadow-inner">
-                                <option value="Academic">Academic 🎓</option>
-                                <option value="Transit">Transit 🚌</option>
-                                <option value="Personal">Personal ⚡</option>
-                            </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Metrics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                
+                <div class="glass-card rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase font-mono">Total Tasks</span>
+                        <div class="w-8 h-8 rounded-lg bg-brand-500/10 text-brand-500 flex items-center justify-center text-sm font-bold">
+                            <i class="fas fa-list-check"></i>
                         </div>
                     </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold" id="metric-total-tasks">0</div>
+                    <span class="text-[11px] text-slate-500 font-medium block">In current workspace</span>
+                </div>
 
-                    <div class="pt-2">
-                        <button type="submit" 
-                            class="w-full bg-gradient-to-r from-brand-accent to-indigo-700 hover:from-indigo-600 hover:to-brand-accent text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-lg transform active:scale-[0.99] flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-plus-circle"></i>
-                            <span>Add to Daily Stream</span>
-                        </button>
+                <div class="glass-card rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase font-mono">Pending</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-sm font-bold">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
                     </div>
-                </form>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-amber-500" id="metric-pending-tasks">0</div>
+                    <span class="text-[11px] text-slate-500 font-medium block">Require focus</span>
+                </div>
 
-                <div class="border-t border-slate-800/80 mt-6 pt-6">
-                    <button onclick="triggerSmartAI()" 
-                        class="w-full bg-slate-900 border border-brand-neonGlow/30 hover:border-brand-neonGlow/80 text-brand-neonGlow font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-md flex items-center justify-center space-x-2 group">
-                        <i class="fa-solid fa-wand-magic-sparkles group-hover:rotate-12 transition"></i>
-                        <span>Run AI Smart Engine</span>
+                <div class="glass-card rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase font-mono">Completed</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-sm font-bold">
+                            <i class="fas fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-500" id="metric-completed-tasks">0</div>
+                    <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold block" id="metric-completion-rate">0% rate</span>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase font-mono">Study Hours</span>
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center text-sm font-bold">
+                            <i class="fas fa-stopwatch"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-purple-500" id="metric-study-hours">0h 0m</div>
+                    <span class="text-[11px] text-slate-500 font-medium block">Total time logged</span>
+                </div>
+
+            </div>
+
+            <!-- Dashboard Columns: Urgent Deadlines + Quick Pomodoro Trigger -->
+            <div class="grid lg:grid-cols-3 gap-8">
+                
+                <!-- Urgent & Upcoming Tasks Column -->
+                <div class="lg:col-span-2 glass-panel rounded-3xl p-6 space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-exclamation-circle text-amber-500"></i>
+                            <h2 class="text-lg font-bold">High Priority & Upcoming Deadlines</h2>
+                        </div>
+                        <button onclick="switchTab('tasks')" class="text-xs font-bold text-brand-500 hover:underline">View All Tasks &rarr;</button>
+                    </div>
+
+                    <div id="dash-upcoming-list" class="space-y-3">
+                        <!-- Dynamic Urgent Task Items Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Quick Focus Launcher Card -->
+                <div class="glass-panel rounded-3xl p-6 space-y-6 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-brand-600 to-purple-700 text-white shadow-xl shadow-brand-500/20 border-none">
+                    <div class="space-y-3">
+                        <span class="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold tracking-wider uppercase inline-block">POMODORO POWER</span>
+                        <h3 class="text-2xl font-extrabold leading-tight">Instant Focus Session</h3>
+                        <p class="text-white/80 text-xs font-medium">Ready to enter deep work? Start a 25-minute Pomodoro cycle with ambient soundscapes.</p>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center space-y-2 border border-white/20">
+                        <span class="font-mono text-3xl font-black tracking-widest block">25 : 00</span>
+                        <span class="text-[10px] uppercase font-bold tracking-wider text-white/70">STANDARD DEEP WORK</span>
+                    </div>
+
+                    <button onclick="switchTab('timer'); startPomodoroTimer();" class="w-full py-3.5 bg-white text-brand-700 hover:bg-slate-100 font-extrabold text-sm rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-play"></i> Launch Focus Mode
                     </button>
                 </div>
+
             </div>
 
-            <!-- Right Panel: Live Timeline Displays -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- AI Insights Overlay Banner -->
-                <div id="aiBanner" class="hidden bg-gradient-to-r from-indigo-950 via-brand-card to-purple-950 border border-brand-accent/30 rounded-2xl p-5 flex items-start space-x-4 animate-fadeIn">
-                    <div class="bg-brand-accent/20 p-2.5 rounded-xl text-brand-neonGlow">
-                        <i class="fa-solid fa-robot text-xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-bold text-brand-neonGlow tracking-wide uppercase">Gemini-Inspired Local Optimization Active</h4>
-                        <p id="aiMessage" class="text-slate-300 text-sm mt-1 font-medium leading-relaxed"></p>
-                    </div>
+        </section>
+
+        <!-- TAB 2: SMART TASK MANAGER -->
+        <section id="tab-tasks" class="tab-content hidden space-y-6">
+            
+            <!-- Controls Bar: Search, Filters & Add Task -->
+            <div class="glass-panel rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="task-search-input" oninput="renderTasks()" placeholder="Search task name or subject..." class="w-full pl-9 pr-4 py-2 rounded-xl text-xs bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
                 </div>
 
-                <!-- Timeline List Card Container -->
-                <div class="bg-brand-card border border-slate-800/80 rounded-2xl p-6 glow-effect min-h-[400px]">
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex items-center space-x-3">
-                            <i class="fa-solid fa-calendar-day text-brand-purpleGlow text-xl"></i>
-                            <h2 class="text-xl font-bold text-white tracking-wide">Your Optimized Timeline</h2>
+                <!-- Filter Controls -->
+                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                    <select id="filter-status" onchange="renderTasks()" class="px-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="all">Status: All</option>
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                    </select>
+
+                    <select id="filter-priority" onchange="renderTasks()" class="px-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="all">Priority: All</option>
+                        <option value="High">High Priority</option>
+                        <option value="Medium">Medium Priority</option>
+                        <option value="Low">Low Priority</option>
+                    </select>
+
+                    <select id="sort-by" onchange="renderTasks()" class="px-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="deadline">Sort: Earliest Deadline</option>
+                        <option value="priority">Sort: Highest Priority</option>
+                        <option value="est">Sort: Estimated Duration</option>
+                    </select>
+                </div>
+
+                <button onclick="openNewTaskModal()" class="w-full md:w-auto px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md shadow-brand-500/20 flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i> New Task
+                </button>
+            </div>
+
+            <!-- Task List Container -->
+            <div id="tasks-container-list" class="space-y-3">
+                <!-- Dynamic Task Cards Injected Here -->
+            </div>
+
+        </section>
+
+        <!-- TAB 3: POMODORO TIMER & SOUNDSCAPES -->
+        <section id="tab-timer" class="tab-content hidden space-y-8">
+            
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Main Circular Timer Card -->
+                <div class="lg:col-span-7 glass-panel rounded-3xl p-8 text-center space-y-8 relative overflow-hidden">
+                    
+                    <!-- Timer Mode Switches -->
+                    <div class="inline-flex p-1.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-300/40 dark:border-slate-800 gap-1 font-bold text-xs">
+                        <button onclick="setTimerMode('pomodoro')" id="mode-btn-pomodoro" class="px-4 py-2 rounded-xl transition-all bg-brand-600 text-white shadow-sm">Focus (25m)</button>
+                        <button onclick="setTimerMode('shortBreak')" id="mode-btn-shortBreak" class="px-4 py-2 rounded-xl transition-all text-slate-500">Short Break (5m)</button>
+                        <button onclick="setTimerMode('longBreak')" id="mode-btn-longBreak" class="px-4 py-2 rounded-xl transition-all text-slate-500">Long Break (15m)</button>
+                    </div>
+
+                    <!-- Circular Animated Display -->
+                    <div class="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto flex items-center justify-center">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle class="text-slate-200 dark:text-slate-800 stroke-current" stroke-width="6" cx="50" cy="50" r="44" fill="transparent"></circle>
+                            <circle id="timer-progress-circle" class="text-brand-500 stroke-current progress-ring-circle" stroke-width="6" stroke-linecap="round" cx="50" cy="50" r="44" fill="transparent" stroke-dasharray="276.46" stroke-dashoffset="0"></circle>
+                        </svg>
+
+                        <div class="absolute space-y-2">
+                            <span id="timer-display" class="font-mono text-5xl sm:text-6xl font-black tracking-widest block">25:00</span>
+                            <span id="timer-mode-label" class="text-xs font-mono font-bold text-brand-500 dark:text-brand-400 uppercase tracking-wider block">DEEP FOCUS SESSION</span>
                         </div>
-                        <button onclick="clearTimeline()" class="text-xs text-slate-500 hover:text-rose-400 font-semibold transition">
-                            <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+                    </div>
+
+                    <!-- Timer Action Buttons -->
+                    <div class="flex items-center justify-center gap-4">
+                        <button onclick="toggleTimer()" id="timer-start-btn" class="px-8 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-base shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center gap-2">
+                            <i class="fas fa-play" id="timer-play-icon"></i> <span id="timer-start-label">Start Session</span>
+                        </button>
+                        <button onclick="resetTimer()" class="p-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold transition-all">
+                            <i class="fas fa-redo-alt"></i>
                         </button>
                     </div>
 
-                    <!-- Interactive Empty State -->
-                    <div id="emptyState" class="flex flex-col items-center justify-center py-20 text-center">
-                        <div class="bg-slate-900/80 p-5 rounded-full border border-slate-800 mb-4 text-slate-600">
-                            <i class="fa-solid fa-folder-open text-4xl"></i>
+                </div>
+
+                <!-- Web Audio Soundscape Control Panel -->
+                <div class="lg:col-span-5 glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-headphones text-purple-500"></i>
+                            <h3 class="font-bold text-lg">Ambient Soundscapes</h3>
                         </div>
-                        <p class="text-slate-400 font-medium">Your schedule stream is empty.</p>
-                        <p class="text-xs text-slate-500 mt-1 max-w-xs">Add standard routine tasks or run the AI Smart Engine to instantly generate a local plan template.</p>
+                        <span class="text-[10px] font-mono bg-purple-500/10 text-purple-500 px-2.5 py-1 rounded-full font-bold">WEB AUDIO API</span>
                     </div>
 
-                    <!-- Dynamic Timeline Stream -->
-                    <div id="timelineContainer" class="relative border-l-2 border-slate-800 ml-4 space-y-6 hidden">
-                        <!-- Items injected here by JavaScript -->
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Generative ambient audio engines to enhance concentration and block distractions.</p>
+
+                    <div class="space-y-4">
+                        
+                        <!-- Rain Sound Engine -->
+                        <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center text-lg">
+                                    <i class="fas fa-cloud-rain"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Gentle Rain</h4>
+                                    <span class="text-[10px] text-slate-400 block font-mono">White noise storm generator</span>
+                                </div>
+                            </div>
+                            <button onclick="toggleSound('rain')" id="sound-btn-rain" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-xs font-bold transition-all">
+                                Play
+                            </button>
+                        </div>
+
+                        <!-- Lo-Fi Binaural Hum -->
+                        <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center text-lg">
+                                    <i class="fas fa-wave-square"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Alpha Binaural Beats</h4>
+                                    <span class="text-[10px] text-slate-400 block font-mono">10Hz focus brainwave</span>
+                                </div>
+                            </div>
+                            <button onclick="toggleSound('binaural')" id="sound-btn-binaural" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-xs font-bold transition-all">
+                                Play
+                            </button>
+                        </div>
+
+                        <!-- Deep Space Synthesizer -->
+                        <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-lg">
+                                    <i class="fas fa-meteor"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Cosmic Ambient Drone</h4>
+                                    <span class="text-[10px] text-slate-400 block font-mono">Deep space warm synth</span>
+                                </div>
+                            </div>
+                            <button onclick="toggleSound('space')" id="sound-btn-space" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-brand-600 hover:text-white text-xs font-bold transition-all">
+                                Play
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- TAB 4: WEEKLY TIMETABLE & SCHEDULE -->
+        <section id="tab-timetable" class="tab-content hidden space-y-6">
+            
+            <div class="glass-panel rounded-3xl p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Weekly Study Block Schedule</h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Plan your weekly subject blocks for optimized retention.</p>
+                    </div>
+                    <button onclick="openTimetableModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2">
+                        <i class="fas fa-calendar-plus"></i> Block Time Slot
+                    </button>
+                </div>
+
+                <!-- Timetable Grid Container -->
+                <div class="overflow-x-auto">
+                    <div class="min-w-[700px] grid grid-cols-8 gap-2 font-mono text-xs">
+                        
+                        <!-- Header Days Row -->
+                        <div class="p-2 font-bold text-slate-400 text-center">TIME</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">MON</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">TUE</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">WED</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">THU</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">FRI</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">SAT</div>
+                        <div class="p-2 font-bold text-center bg-slate-100 dark:bg-slate-900 rounded-lg">SUN</div>
+
+                        <!-- Schedule Blocks Injected via JS -->
+                        <div id="timetable-grid-content" class="col-span-8 grid grid-cols-8 gap-2"></div>
                     </div>
                 </div>
             </div>
 
-        </div>
+        </section>
+
+        <!-- TAB 5: ANALYTICS & INSIGHTS -->
+        <section id="tab-analytics" class="tab-content hidden space-y-8">
+            
+            <div class="grid lg:grid-cols-2 gap-8">
+                
+                <!-- Chart 1: Subject Time Distribution -->
+                <div class="glass-panel rounded-3xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-base">Subject Time Distribution (Hours)</h3>
+                        <span class="text-[10px] font-mono text-brand-500 font-bold uppercase">CANVAS METRICS</span>
+                    </div>
+                    <div class="h-64 flex items-center justify-center relative">
+                        <canvas id="subject-distribution-chart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Weekly Focus Trend -->
+                <div class="glass-panel rounded-3xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-base">Weekly Task Completion Rate</h3>
+                        <span class="text-[10px] font-mono text-emerald-500 font-bold uppercase">PERFORMANCE</span>
+                    </div>
+                    <div class="h-64 flex items-center justify-center relative">
+                        <canvas id="weekly-trend-chart" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
-    <!-- Footer Summary Section -->
-    <footer class="max-w-7xl mx-auto px-6 py-8 mt-12 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 font-medium space-y-4 sm:space-y-0">
-        <div>&copy; 2026 CCT SmartTracker. Built for MLH Hack Days.</div>
-        <div class="flex space-x-4">
-            <span><i class="fa-solid fa-code-branch mr-1"></i> Hosted on GitHub Pages</span>
-            <span><i class="fa-solid fa-bolt mr-1"></i> Tailwind Stack</span>
-        </div>
-    </footer>
+    <!-- MODAL 1: ADD / EDIT TASK -->
+    <div id="task-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="glass-panel max-w-lg w-full rounded-3xl p-6 space-y-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 id="modal-task-heading" class="font-bold text-lg">Add New Task</h3>
+                <button onclick="closeTaskModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
 
+            <form id="task-form" onsubmit="handleTaskFormSubmit(event)" class="space-y-4 text-xs font-semibold">
+                <input type="hidden" id="form-task-id">
+
+                <div class="space-y-1">
+                    <label class="text-slate-500 dark:text-slate-400">Task Title *</label>
+                    <input type="text" id="form-task-title" required placeholder="e.g. Complete Calculus Problem Set #4" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Subject / Course *</label>
+                        <input type="text" id="form-task-subject" required placeholder="e.g. Mathematics" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Category</label>
+                        <select id="form-task-category" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="Lecture">Lecture</option>
+                            <option value="Homework">Homework</option>
+                            <option value="Revision">Revision</option>
+                            <option value="Exam Prep">Exam Prep</option>
+                            <option value="Project">Project</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Priority</label>
+                        <select id="form-task-priority" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="High">High</option>
+                            <option value="Medium" selected>Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Est. Mins</label>
+                        <input type="number" id="form-task-duration" min="5" max="600" value="45" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Deadline</label>
+                        <input type="date" id="form-task-deadline" required class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" onclick="closeTaskModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold shadow-md shadow-brand-500/20">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ADD SCHEDULE BLOCK -->
+    <div id="timetable-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+        <div class="glass-panel max-w-md w-full rounded-3xl p-6 space-y-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="font-bold text-lg">Add Weekly Schedule Block</h3>
+                <button onclick="closeTimetableModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+
+            <form id="timetable-form" onsubmit="handleTimetableFormSubmit(event)" class="space-y-4 text-xs font-semibold">
+                <div class="space-y-1">
+                    <label class="text-slate-500 dark:text-slate-400">Subject Name</label>
+                    <input type="text" id="tt-subject" required placeholder="e.g. Physics Revision" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Day</label>
+                        <select id="tt-day" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                            <option value="MON">Monday</option>
+                            <option value="TUE">Tuesday</option>
+                            <option value="WED">Wednesday</option>
+                            <option value="THU">Thursday</option>
+                            <option value="FRI">Friday</option>
+                            <option value="SAT">Saturday</option>
+                            <option value="SUN">Sunday</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-slate-500 dark:text-slate-400">Time Window</label>
+                        <select id="tt-time" class="w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                            <option value="08:00 AM">08:00 AM</option>
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="01:00 PM">01:00 PM</option>
+                            <option value="03:00 PM">03:00 PM</option>
+                            <option value="06:00 PM">06:00 PM</option>
+                            <option value="08:00 PM">08:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" onclick="closeTimetableModal()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-600 text-white font-extrabold">Save Block</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Core -->
+    <script>
+        // Default Pre-loaded Sample Data
+        const SAMPLE_TASKS = [
+            { id: 't1', title: 'Calculus III Problem Set #5', subject: 'Mathematics', category: 'Homework', priority: 'High', duration: 60, deadline: new Date(Date.now() + 86400000).toISOString().split('T')[0], completed: false, completedAt: null },
+            { id: 't2', title: 'Data Structures Heap Trees Chapter', subject: 'Computer Science', category: 'Revision', priority: 'High', duration: 45, deadline: new Date(Date.now() + 172800000).toISOString().split('T')[0], completed: true, completedAt: new Date().toISOString() },
+            { id: 't3', title: 'Physics Quantum Electrodynamics Lab', subject: 'Physics', category: 'Project', priority: 'Medium', duration: 90, deadline: new Date(Date.now() + 259200000).toISOString().split('T')[0], completed: false, completedAt: null },
+            { id: 't4', title: 'Linear Algebra Matrix Transformations', subject: 'Mathematics', category: 'Lecture', priority: 'Low', duration: 30, deadline: new Date(Date.now() + 345600000).toISOString().split('T')[0], completed: false, completedAt: null }
+        ];
+
+        const SAMPLE_SCHEDULE = [
+            { id: 's1', day: 'MON', time: '08:00 AM', subject: 'Mathematics' },
+            { id: 's2', day: 'MON', time: '10:00 AM', subject: 'Computer Science' },
+            { id: 's3', day: 'WED', time: '01:00 PM', subject: 'Physics' },
+            { id: 's4', day: 'FRI', time: '03:00 PM', subject: 'Calculus Revision' }
+        ];
+
+        // State Store
+        let state = {
+            tasks: JSON.parse(localStorage.getItem('aura_tasks')) || SAMPLE_TASKS,
+            schedule: JSON.parse(localStorage.getItem('aura_schedule')) || SAMPLE_SCHEDULE,
+            timer: {
+                minutes: 25,
+                seconds: 0,
+                totalSeconds: 1500,
+                remainingSeconds: 1500,
+                isRunning: false,
+                mode: 'pomodoro', // pomodoro | shortBreak | longBreak
+                interval: null
+            },
+            stats: JSON.parse(localStorage.getItem('aura_stats')) || { totalFocusSeconds: 2700, streak: 7 }
+        };
+
+        // 1. Navigation & Theme Engine
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-tab').forEach(el => {
+                el.classList.remove('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+                el.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-white', 'dark:bg-slate-800', 'text-brand-600', 'dark:text-brand-400', 'shadow-sm');
+            }
+
+            if (tabId === 'analytics') renderCharts();
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Good Morning';
+            if (hour >= 12 && hour < 17) greeting = 'Good Afternoon';
+            else if (hour >= 17) greeting = 'Good Evening';
+            document.getElementById('dynamic-greeting').textContent = greeting;
+        }
+
+        // 2. Task Management Logic
+        function saveTasksToStorage() {
+            localStorage.setItem('aura_tasks', JSON.stringify(state.tasks));
+            renderDashboardMetrics();
+            renderTasks();
+        }
+
+        function renderDashboardMetrics() {
+            const total = state.tasks.length;
+            const completed = state.tasks.filter(t => t.completed).length;
+            const pending = total - completed;
+            const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const hours = (state.stats.totalFocusSeconds / 3600).toFixed(1);
+
+            document.getElementById('metric-total-tasks').textContent = total;
+            document.getElementById('metric-pending-tasks').textContent = pending;
+            document.getElementById('metric-completed-tasks').textContent = completed;
+            document.getElementById('metric-completion-rate').textContent = `${rate}% completed`;
+            document.getElementById('metric-study-hours').textContent = `${hours} hrs`;
+
+            document.getElementById('dash-progress-percent').textContent = `${rate}%`;
+            document.getElementById('dash-task-ratio').textContent = `${completed} / ${total} Tasks`;
+            document.getElementById('dash-hours-logged').textContent = `${hours} hrs`;
+
+            // Progress Ring Circle Offset
+            const ring = document.getElementById('dash-progress-ring');
+            const circumference = 251.2;
+            ring.style.strokeDashoffset = circumference - (rate / 100) * circumference;
+
+            // Render Urgent Upcoming Tasks
+            const upcomingList = document.getElementById('dash-upcoming-list');
+            upcomingList.innerHTML = '';
+            const pendingTasks = state.tasks.filter(t => !t.completed).slice(0, 3);
+
+            if (pendingTasks.length === 0) {
+                upcomingList.innerHTML = `<div class="p-4 text-center text-slate-400 font-semibold text-xs">All clear! No pending tasks found.</div>`;
+            } else {
+                pendingTasks.forEach(task => {
+                    const el = document.createElement('div');
+                    el.className = 'glass-card rounded-2xl p-4 flex items-center justify-between';
+                    el.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleTaskCompletion('${task.id}')" class="w-6 h-6 rounded-lg border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs">
+                                <i class="fas fa-check opacity-0"></i>
+                            </button>
+                            <div>
+                                <h4 class="font-bold text-xs">${task.title}</h4>
+                                <span class="text-[10px] text-slate-400 font-mono">${task.subject} • ${task.deadline}</span>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${task.priority === 'High' ? 'bg-rose-500/10 text-rose-500' : 'bg-amber-500/10 text-amber-500'}">${task.priority}</span>
+                    `;
+                    upcomingList.appendChild(el);
+                });
+            }
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('tasks-container-list');
+            const search = document.getElementById('task-search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+            const priorityFilter = document.getElementById('filter-priority').value;
+            const sortBy = document.getElementById('sort-by').value;
+
+            let filtered = state.tasks.filter(t => {
+                const matchesSearch = t.title.toLowerCase().includes(search) || t.subject.toLowerCase().includes(search);
+                const matchesStatus = statusFilter === 'all' || (statusFilter === 'completed' ? t.completed : !t.completed);
+                const matchesPriority = priorityFilter === 'all' || t.priority === priorityFilter;
+                return matchesSearch && matchesStatus && matchesPriority;
+            });
+
+            // Sorting
+            filtered.sort((a, b) => {
+                if (sortBy === 'deadline') return new Date(a.deadline) - new Date(b.deadline);
+                if (sortBy === 'priority') {
+                    const pMap = { High: 3, Medium: 2, Low: 1 };
+                    return pMap[b.priority] - pMap[a.priority];
+                }
+                if (sortBy === 'est') return b.duration - a.duration;
+            });
+
+            list.innerHTML = '';
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="p-12 text-center text-slate-400 font-semibold text-xs glass-panel rounded-2xl">No matching tasks found.</div>`;
+                return;
+            }
+
+            filtered.forEach(task => {
+                const item = document.createElement('div');
+                item.className = `glass-card rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${task.completed ? 'opacity-60' : ''}`;
+                item.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleTaskCompletion('${task.id}')" class="w-6 h-6 rounded-lg border-2 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-700'} flex items-center justify-center text-xs transition-all">
+                            <i class="fas fa-check ${task.completed ? 'opacity-100' : 'opacity-0'}"></i>
+                        </button>
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-sm ${task.completed ? 'line-through text-slate-400' : ''}">${task.title}</h4>
+                            <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
+                                <span class="bg-brand-500/10 text-brand-500 px-2 py-0.5 rounded-full font-bold">${task.subject}</span>
+                                <span>${task.category}</span>
+                                <span>• ${task.duration} mins</span>
+                                <span>• Due: ${task.deadline}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 self-end sm:self-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${task.priority === 'High' ? 'bg-rose-500/10 text-rose-500' : task.priority === 'Medium' ? 'bg-amber-500/10 text-amber-500' : 'bg-slate-500/10 text-slate-500'}">${task.priority}</span>
+                        <button onclick="deleteTask('${task.id}')" class="p-2 text-slate-400 hover:text-rose-500 transition-all">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function toggleTaskCompletion(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                task.completedAt = task.completed ? new Date().toISOString() : null;
+                saveTasksToStorage();
+            }
+        }
+
+        function deleteTask(taskId) {
+            state.tasks = state.tasks.filter(t => t.id !== taskId);
+            saveTasksToStorage();
+        }
+
+        function openNewTaskModal() {
+            document.getElementById('task-form').reset();
+            document.getElementById('form-task-id').value = '';
+            document.getElementById('form-task-deadline').value = new Date().toISOString().split('T')[0];
+            document.getElementById('task-modal').classList.remove('hidden');
+            document.getElementById('task-modal').classList.add('flex');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.add('hidden');
+            document.getElementById('task-modal').classList.remove('flex');
+        }
+
+        function handleTaskFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('form-task-id').value || 't_' + Date.now();
+            const title = document.getElementById('form-task-title').value;
+            const subject = document.getElementById('form-task-subject').value;
+            const category = document.getElementById('form-task-category').value;
+            const priority = document.getElementById('form-task-priority').value;
+            const duration = parseInt(document.getElementById('form-task-duration').value);
+            const deadline = document.getElementById('form-task-deadline').value;
+
+            const existingIndex = state.tasks.findIndex(t => t.id === id);
+            const newTask = { id, title, subject, category, priority, duration, deadline, completed: false, completedAt: null };
+
+            if (existingIndex > -1) state.tasks[existingIndex] = newTask;
+            else state.tasks.push(newTask);
+
+            saveTasksToStorage();
+            closeTaskModal();
+        }
+
+        // 3. Pomodoro Timer Logic
+        function setTimerMode(mode) {
+            state.timer.mode = mode;
+            pauseTimer();
+
+            document.querySelectorAll('#tab-timer button[id^="mode-btn-"]').forEach(b => {
+                b.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
+                b.classList.add('text-slate-500');
+            });
+            document.getElementById(`mode-btn-${mode}`).classList.add('bg-brand-600', 'text-white', 'shadow-sm');
+
+            if (mode === 'pomodoro') state.timer.totalSeconds = 25 * 60;
+            else if (mode === 'shortBreak') state.timer.totalSeconds = 5 * 60;
+            else if (mode === 'longBreak') state.timer.totalSeconds = 15 * 60;
+
+            state.timer.remainingSeconds = state.timer.totalSeconds;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(state.timer.remainingSeconds / 60);
+            const secs = state.timer.remainingSeconds % 60;
+            document.getElementById('timer-display').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            // Ring progress
+            const circle = document.getElementById('timer-progress-circle');
+            const circumference = 276.46;
+            const percent = state.timer.remainingSeconds / state.timer.totalSeconds;
+            circle.style.strokeDashoffset = circumference - (percent * circumference);
+        }
+
+        function toggleTimer() {
+            if (state.timer.isRunning) pauseTimer();
+            else startPomodoroTimer();
+        }
+
+        function startPomodoroTimer() {
+            if (state.timer.isRunning) return;
+            state.timer.isRunning = true;
+            document.getElementById('timer-play-icon').className = 'fas fa-pause';
+            document.getElementById('timer-start-label').textContent = 'Pause Session';
+
+            state.timer.interval = setInterval(() => {
+                if (state.timer.remainingSeconds > 0) {
+                    state.timer.remainingSeconds--;
+                    if (state.timer.mode === 'pomodoro') {
+                        state.stats.totalFocusSeconds++;
+                        localStorage.setItem('aura_stats', JSON.stringify(state.stats));
+                        renderDashboardMetrics();
+                    }
+                    updateTimerDisplay();
+                } else {
+                    pauseTimer();
+                    playCompletionChime();
+                    alert("Focus session complete! Take a break.");
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            state.timer.isRunning = false;
+            clearInterval(state.timer.interval);
+            document.getElementById('timer-play-icon').className = 'fas fa-play';
+            document.getElementById('timer-start-label').textContent = 'Start Session';
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            state.timer.remainingSeconds = state.timer.totalSeconds;
+            updateTimerDisplay();
+        }
+
+        // 4. Web Audio API Ambient Soundscapes Engine
+        let audioContext = null;
+        let activeNodes = {};
+
+        function initAudio() {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function toggleSound(type) {
+            initAudio();
+            const btn = document.getElementById(`sound-btn-${type}`);
+
+            if (activeNodes[type]) {
+                activeNodes[type].stop();
+                delete activeNodes[type];
+                btn.textContent = 'Play';
+                btn.classList.remove('bg-brand-600', 'text-white');
+            } else {
+                const node = createAmbientNode(type);
+                if (node) {
+                    activeNodes[type] = node;
+                    btn.textContent = 'Stop';
+                    btn.classList.add('bg-brand-600', 'text-white');
+                }
+            }
+        }
+
+        function createAmbientNode(type) {
+            if (type === 'rain') {
+                const bufferSize = audioContext.sampleRate * 2;
+                const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                const noise = audioContext.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+
+                const filter = audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 800;
+
+                const gain = audioContext.createGain();
+                gain.gain.value = 0.08;
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioContext.destination);
+                noise.start();
+                return noise;
+            } else if (type === 'binaural' || type === 'space') {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = type === 'binaural' ? 'sine' : 'sawtooth';
+                osc.frequency.setValueAtTime(type === 'binaural' ? 210 : 110, audioContext.currentTime);
+                gain.gain.setValueAtTime(0.05, audioContext.currentTime);
+
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                return osc;
+            }
+            return null;
+        }
+
+        function playCompletionChime() {
+            initAudio();
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, audioContext.currentTime); // D5
+            gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 1.2);
+        }
+
+        // 5. Timetable Schedule Engine
+        function renderTimetable() {
+            const grid = document.getElementById('timetable-grid-content');
+            grid.innerHTML = '';
+            const times = ['08:00 AM', '10:00 AM', '01:00 PM', '03:00 PM', '06:00 PM', '08:00 PM'];
+            const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+            times.forEach(time => {
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'p-2 text-[10px] font-bold text-slate-400 text-center self-center';
+                timeLabel.textContent = time;
+                grid.appendChild(timeLabel);
+
+                days.forEach(day => {
+                    const block = state.schedule.find(s => s.day === day && s.time === time);
+                    const cell = document.createElement('div');
+                    cell.className = 'min-h-[50px] p-2 rounded-xl border border-slate-200/50 dark:border-slate-800 flex flex-col justify-center text-center';
+                    
+                    if (block) {
+                        cell.className += ' bg-brand-500/10 text-brand-500 border-brand-500/30 font-bold';
+                        cell.innerHTML = `
+                            <span class="text-[10px] block leading-tight">${block.subject}</span>
+                            <button onclick="deleteScheduleBlock('${block.id}')" class="text-[8px] text-slate-400 hover:text-rose-500 mt-1">&times; Remove</button>
+                        `;
+                    } else {
+                        cell.className += ' bg-slate-100/30 dark:bg-slate-900/30 text-slate-300 dark:text-slate-700';
+                        cell.textContent = '-';
+                    }
+                    grid.appendChild(cell);
+                });
+            });
+        }
+
+        function openTimetableModal() {
+            document.getElementById('timetable-modal').classList.remove('hidden');
+            document.getElementById('timetable-modal').classList.add('flex');
+        }
+
+        function closeTimetableModal() {
+            document.getElementById('timetable-modal').classList.add('hidden');
+            document.getElementById('timetable-modal').classList.remove('flex');
+        }
+
+        function handleTimetableFormSubmit(e) {
+            e.preventDefault();
+            const subject = document.getElementById('tt-subject').value;
+            const day = document.getElementById('tt-day').value;
+            const time = document.getElementById('tt-time').value;
+
+            state.schedule.push({ id: 's_' + Date.now(), subject, day, time });
+            localStorage.setItem('aura_schedule', JSON.stringify(state.schedule));
+            renderTimetable();
+            closeTimetableModal();
+        }
+
+        function deleteScheduleBlock(id) {
+            state.schedule = state.schedule.filter(s => s.id !== id);
+            localStorage.setItem('aura_schedule', JSON.stringify(state.schedule));
+            renderTimetable();
+        }
+
+        // 6. Analytics Visual Charts (HTML5 Canvas)
+        function renderCharts() {
+            // Subject Distribution Chart
+            const canvas1 = document.getElementById('subject-distribution-chart');
+            const ctx1 = canvas1.getContext('2d');
+            canvas1.width = canvas1.parentElement.clientWidth;
+            canvas1.height = canvas1.parentElement.clientHeight;
+
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+            const subjectCounts = {};
+            state.tasks.forEach(t => subjectCounts[t.subject] = (subjectCounts[t.subject] || 0) + t.duration);
+
+            const keys = Object.keys(subjectCounts);
+            if (keys.length === 0) return;
+
+            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#06b6d4'];
+            let startAngle = 0;
+            const total = Object.values(subjectCounts).reduce((a, b) => a + b, 0);
+
+            keys.forEach((key, idx) => {
+                const slice = (subjectCounts[key] / total) * Math.PI * 2;
+                ctx1.beginPath();
+                ctx1.arc(canvas1.width / 2, canvas1.height / 2, 80, startAngle, startAngle + slice);
+                ctx1.lineTo(canvas1.width / 2, canvas1.height / 2);
+                ctx1.fillStyle = colors[idx % colors.length];
+                ctx1.fill();
+                startAngle += slice;
+            });
+
+            // Weekly Trend Bar Chart
+            const canvas2 = document.getElementById('weekly-trend-chart');
+            const ctx2 = canvas2.getContext('2d');
+            canvas2.width = canvas2.parentElement.clientWidth;
+            canvas2.height = canvas2.parentElement.clientHeight;
+
+            ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const barWidth = 30;
+            const spacing = (canvas2.width - 60) / days.length;
+
+            days.forEach((day, i) => {
+                const height = Math.random() * 120 + 30;
+                const x = 40 + i * spacing;
+                const y = canvas2.height - height - 30;
+
+                ctx2.fillStyle = '#6366f1';
+                ctx2.fillRect(x, y, barWidth, height);
+
+                ctx2.fillStyle = '#94a3b8';
+                ctx2.font = '10px Plus Jakarta Sans';
+                ctx2.fillText(day, x + 5, canvas2.height - 10);
+            });
+        }
+
+        // Initialize Application
+        window.onload = function() {
+            updateGreeting();
+            renderDashboardMetrics();
+            renderTasks();
+            renderTimetable();
+            updateTimerDisplay();
+        };
+    </script>
+</body>
+</html>
